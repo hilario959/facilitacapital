@@ -2,6 +2,9 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const repoRoot = path.dirname(fileURLToPath(import.meta.url))
 
 function leadsApi(): Plugin {
   const file = path.resolve('data/leads.json')
@@ -51,7 +54,20 @@ function leadsApi(): Plugin {
 }
 
 export default defineConfig(({ command }) => ({
-  // GitHub Pages sirve el sitio en /facilitacapital/, no en la raíz del dominio.
+  root: path.join(repoRoot, 'src'),
+  publicDir: path.join(repoRoot, 'public'),
+  // GitHub Pages publica este repo desde main/ (raíz), en /facilitacapital/.
   base: command === 'build' ? '/facilitacapital/' : '/',
   plugins: [react(), leadsApi()],
+  build: {
+    outDir: path.join(repoRoot, 'dist'),
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/app.js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name][extname]',
+      },
+    },
+  },
 }))
