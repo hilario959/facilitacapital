@@ -53,14 +53,27 @@ function leadsApi(): Plugin {
   }
 }
 
+function githubPages(): Plugin {
+  const outDir = path.join(repoRoot, 'docs')
+  return {
+    name: 'github-pages',
+    closeBundle() {
+      const index = path.join(outDir, 'index.html')
+      if (!fs.existsSync(index)) return
+      fs.copyFileSync(index, path.join(outDir, '404.html'))
+      fs.writeFileSync(path.join(outDir, '.nojekyll'), '')
+    },
+  }
+}
+
 export default defineConfig(({ command }) => ({
   root: path.join(repoRoot, 'src'),
   publicDir: path.join(repoRoot, 'public'),
-  // GitHub Pages publica este repo desde main/ (raíz), en /facilitacapital/.
+  // GitHub Pages sirve /docs como la raíz del sitio en /facilitacapital/.
   base: command === 'build' ? '/facilitacapital/' : '/',
-  plugins: [react(), leadsApi()],
+  plugins: [react(), leadsApi(), githubPages()],
   build: {
-    outDir: path.join(repoRoot, 'dist'),
+    outDir: path.join(repoRoot, 'docs'),
     emptyOutDir: true,
     rollupOptions: {
       output: {
