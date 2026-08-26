@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { publicUrl } from '../lib/assets'
 import { formatMoneyWithSign } from '../lib/finance'
 
 const TARGET = 43_200
@@ -29,7 +30,7 @@ export function HeroVisual() {
     <div className="hero-visual">
       <div className="hero-photo">
         <img
-          src="/hero/emprendedora.jpg"
+          src={publicUrl('hero/emprendedora.jpg')}
           alt="Emprendedora adelantando facturas desde Facilita"
         />
       </div>

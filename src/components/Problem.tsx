@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { publicUrl } from '../lib/assets'
 
 export function Problem() {
   const bgRef = useRef<HTMLDivElement>(null)
@@ -27,7 +28,7 @@ export function Problem() {
     <section className="problem" id="problema">
       <div className="problem-bg" ref={bgRef}>
         <img
-          src="/hero/negocio.jpg"
+          src={publicUrl('hero/negocio.jpg')}
           alt="Emprendedores atendiendo su negocio"
         />
       </div>

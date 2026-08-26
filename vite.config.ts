@@ -50,6 +50,8 @@ function leadsApi(): Plugin {
   }
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // GitHub Pages sirve el sitio en /facilitacapital/, no en la raíz del dominio.
+  base: command === 'build' ? '/facilitacapital/' : '/',
   plugins: [react(), leadsApi()],
-})
+}))

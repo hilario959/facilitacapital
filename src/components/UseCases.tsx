@@ -1,31 +1,33 @@
+import { publicUrl } from '../lib/assets'
+
 const CASES = [
   {
     title: 'Compra inventario',
     text: 'No pierdas oportunidades por esperar un pago.',
     name: 'Daniela',
     sector: 'Distribuidora',
-    image: '/clients/daniela.jpg',
+    image: publicUrl('clients/daniela.jpg'),
   },
   {
     title: 'Paga proveedores',
     text: 'Mantén buenas relaciones y negocia mejores condiciones.',
     name: 'Andrés',
     sector: 'Alimentos',
-    image: '/clients/andres.jpg',
+    image: publicUrl('clients/andres.jpg'),
   },
   {
     title: 'Toma nuevos proyectos',
     text: 'Financia el crecimiento sin detener tu operación.',
     name: 'Camila',
     sector: 'Manufactura',
-    image: '/clients/camila.jpg',
+    image: publicUrl('clients/camila.jpg'),
   },
   {
     title: 'Cubre capital de trabajo',
     text: 'Haz que tus ventas trabajen para ti desde hoy.',
     name: 'Luis',
     sector: 'Logística',
-    image: '/clients/luis.jpg',
+    image: publicUrl('clients/luis.jpg'),
   },
 ]
 
