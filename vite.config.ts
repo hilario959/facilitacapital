@@ -62,15 +62,16 @@ function githubPages(): Plugin {
       if (!fs.existsSync(index)) return
       fs.copyFileSync(index, path.join(outDir, '404.html'))
       fs.writeFileSync(path.join(outDir, '.nojekyll'), '')
+      fs.writeFileSync(path.join(outDir, 'CNAME'), 'facilitacapital.com\n')
     },
   }
 }
 
-export default defineConfig(({ command }) => ({
+export default defineConfig({
   root: path.join(repoRoot, 'src'),
   publicDir: path.join(repoRoot, 'public'),
-  // GitHub Pages sirve /docs como la raíz del sitio en /facilitacapital/.
-  base: command === 'build' ? '/facilitacapital/' : '/',
+  // Dominio propio: GitHub Pages sirve el sitio en la raíz, no en /facilitacapital/.
+  base: '/',
   plugins: [react(), leadsApi(), githubPages()],
   build: {
     outDir: path.join(repoRoot, 'docs'),
@@ -83,4 +84,4 @@ export default defineConfig(({ command }) => ({
       },
     },
   },
-}))
+})
