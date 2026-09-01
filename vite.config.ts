@@ -63,6 +63,17 @@ function githubPages(): Plugin {
       fs.copyFileSync(index, path.join(outDir, '404.html'))
       fs.writeFileSync(path.join(outDir, '.nojekyll'), '')
       fs.writeFileSync(path.join(outDir, 'CNAME'), 'facilitacapital.com\n')
+
+      // GitHub Pages de este repo también publica desde la raíz del branch.
+      for (const file of ['index.html', '404.html']) {
+        fs.copyFileSync(path.join(outDir, file), path.join(repoRoot, file))
+      }
+      const assetsSrc = path.join(outDir, 'assets')
+      const assetsDest = path.join(repoRoot, 'assets')
+      fs.mkdirSync(assetsDest, { recursive: true })
+      for (const name of fs.readdirSync(assetsSrc)) {
+        fs.copyFileSync(path.join(assetsSrc, name), path.join(assetsDest, name))
+      }
     },
   }
 }
