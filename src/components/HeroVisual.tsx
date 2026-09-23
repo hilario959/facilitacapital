@@ -28,17 +28,17 @@ export function HeroVisual() {
 
   return (
     <div className="hero-visual">
-      <div className="hero-photo">
+      <div className="hero-photo" style={{ position: 'relative' }}>
         <img
           src={publicUrl('hero/emprendedora.jpg')}
           alt="Emprendedora adelantando facturas desde Facilita"
         />
+        <aside className="hero-float" aria-label="Liquidez disponible hoy">
+          <p className="hero-float-kicker">Hoy puedes recibir</p>
+          <p className="hero-float-amount">{formatMoneyWithSign(amount)}</p>
+          <p className="hero-float-meta">Factura F-1842 · 60 días</p>
+        </aside>
       </div>
-      <aside className="hero-float" aria-label="Liquidez disponible hoy">
-        <p className="hero-float-kicker">Hoy puedes recibir</p>
-        <p className="hero-float-amount">{formatMoneyWithSign(amount)}</p>
-        <p className="hero-float-meta">Factura F-1842 · 60 días</p>
-      </aside>
     </div>
   )
 }
