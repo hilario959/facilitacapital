@@ -243,11 +243,9 @@ class EditSite extends Page
 
     private function imageUpload(string $name): FileUpload
     {
-        $disk = config('filesystems.media_disk', 'public');
-
         return FileUpload::make($name)
             ->image()
-            ->disk(is_string($disk) ? $disk : 'public')
+            ->disk(SiteContent::mediaDisk())
             ->directory('site')
             ->fetchFileInformation(false)
             ->getUploadedFileUsing(function (string $file): array {

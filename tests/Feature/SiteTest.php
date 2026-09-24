@@ -8,6 +8,7 @@ use App\Mail\LeadAcknowledgement;
 use App\Models\Lead;
 use App\Models\User;
 use App\Support\Finance;
+use App\Support\SiteContent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -34,11 +35,30 @@ class SiteTest extends TestCase
         $response->assertSee('/images/hero-emprendedora.jpg', false);
         $response->assertSee('/images/problem-negocio.jpg', false);
         $response->assertSee('/images/case-daniela.jpg', false);
+        $response->assertDontSee('/storage/', false);
         $response->assertSee('Solicitar este monto');
         $response->assertSee('WhatsApp');
         $response->assertSee('NIT');
         $response->assertDontSee('Quiero saber si califico');
         $response->assertDontSee('name="company"', false);
+    }
+
+    public function test_uploaded_images_use_the_cloud_bucket_url(): void
+    {
+        config([
+            'filesystems.default' => 'fotos',
+            'filesystems.disks.fotos' => [
+                'driver' => 's3',
+                'bucket' => 'facilita',
+                'url' => 'https://pub.example.test',
+            ],
+        ]);
+
+        $this->assertSame('fotos', SiteContent::mediaDisk());
+        $this->assertSame(
+            'https://pub.example.test/site/hero-nueva.jpg',
+            SiteContent::url('site/hero-nueva.jpg'),
+        );
     }
 
     public function test_calculator_request_saves_a_lead_and_sends_email(): void

@@ -15,9 +15,9 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
-    // Subidas del sitio. En local es el disco public. En Laravel Cloud, el
-    // bucket público se usa cuando FILESYSTEM_DISK apunta a un disco s3.
-    'media_disk' => env('MEDIA_DISK', env('FILESYSTEM_DISK', 'local') === 'local' ? 'public' : env('FILESYSTEM_DISK', 'public')),
+    // En Laravel Cloud el disco por defecto llega con el nombre del bucket
+    // (mínimo 3 caracteres). La URL pública viene en la configuración del disco.
+    'media_disk' => env('MEDIA_DISK'),
 
     /*
     |--------------------------------------------------------------------------

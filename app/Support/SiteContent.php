@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Lead;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class SiteContent
 {
@@ -228,12 +229,51 @@ class SiteContent
             return '/images/'.$basename;
         }
 
-        $disk = config('filesystems.media_disk', 'public');
-        if (! is_string($disk) || $disk === '' || $disk === 'public' || $disk === 'local') {
+        $disk = self::mediaDisk();
+        if ($disk === 'public') {
             return '/storage/'.ltrim($path, '/');
         }
 
-        return Storage::disk($disk)->url($path);
+        $base = config("filesystems.disks.{$disk}.url");
+        if (is_string($base) && $base !== '') {
+            return rtrim($base, '/').'/'.ltrim($path, '/');
+        }
+
+        try {
+            return Storage::disk($disk)->temporaryUrl($path, now()->addDay());
+        } catch (Throwable) {
+            return Storage::disk($disk)->url($path);
+        }
+    }
+
+    public static function mediaDisk(): string
+    {
+        foreach ([config('filesystems.default'), config('filesystems.media_disk')] as $name) {
+            if (self::isCloudDisk($name)) {
+                return $name;
+            }
+        }
+
+        foreach (config('filesystems.disks', []) as $name => $disk) {
+            if (self::isCloudDisk($name)) {
+                return $name;
+            }
+        }
+
+        return 'public';
+    }
+
+    private static function isCloudDisk(mixed $name): bool
+    {
+        if (! is_string($name) || $name === '' || $name === 'local' || $name === 'public') {
+            return false;
+        }
+
+        $disk = config("filesystems.disks.{$name}");
+
+        return is_array($disk)
+            && ($disk['driver'] ?? null) === 's3'
+            && filled($disk['bucket'] ?? null);
     }
 
     public static function ensureImages(): void
