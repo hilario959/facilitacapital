@@ -15,6 +15,10 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    // Subidas del sitio. En local es el disco public. En Laravel Cloud, el
+    // bucket público se usa cuando FILESYSTEM_DISK apunta a un disco s3.
+    'media_disk' => env('MEDIA_DISK', env('FILESYSTEM_DISK', 'local') === 'local' ? 'public' : env('FILESYSTEM_DISK', 'public')),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
@@ -51,10 +55,10 @@ return [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
+            'region' => env('AWS_DEFAULT_REGION', 'auto'),
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
+            'endpoint' => env('AWS_ENDPOINT', env('AWS_ENDPOINT_URL')),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,

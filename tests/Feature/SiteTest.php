@@ -31,6 +31,9 @@ class SiteTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Capital al ritmo de tu empresa.');
+        $response->assertSee('/images/hero-emprendedora.jpg', false);
+        $response->assertSee('/images/problem-negocio.jpg', false);
+        $response->assertSee('/images/case-daniela.jpg', false);
         $response->assertSee('Solicitar este monto');
         $response->assertSee('WhatsApp');
         $response->assertSee('NIT');

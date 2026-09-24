@@ -223,7 +223,17 @@ class SiteContent
             return $path;
         }
 
-        return Storage::disk('public')->url($path);
+        $basename = basename($path);
+        if (array_key_exists($basename, self::packagedImages())) {
+            return '/images/'.$basename;
+        }
+
+        $disk = config('filesystems.media_disk', 'public');
+        if (! is_string($disk) || $disk === '' || $disk === 'public' || $disk === 'local') {
+            return '/storage/'.ltrim($path, '/');
+        }
+
+        return Storage::disk($disk)->url($path);
     }
 
     public static function ensureImages(): void
@@ -235,7 +245,7 @@ class SiteContent
                 continue;
             }
 
-            $absolute = resource_path('site-images/'.$source);
+            $absolute = public_path('images/'.$source);
             if (! is_file($absolute)) {
                 continue;
             }

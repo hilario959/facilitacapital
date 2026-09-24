@@ -29,6 +29,12 @@ php artisan serve
 
 El usuario administrador sale de `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
 
+## Laravel Cloud
+
+Las fotos que vienen con el sitio viven en `public/images` y se sirven directo, sin `storage:link`. En Cloud ese enlace no permanece después del deploy y el disco local se borra entre requests.
+
+Si vas a subir fotos nuevas desde el administrador, crea un bucket público de Object Storage, ponle de nombre de disco `s3` y márcalo como disco por defecto. Después copia la URL pública del bucket a la variable `AWS_URL`. No hace falta correr `php artisan storage:link`.
+
 ## Correo
 
 En local el correo de confirmación queda en `storage/logs/laravel.log` (`MAIL_MAILER=log`). Para enviarlo de verdad, configura SMTP en `.env` (`MAIL_MAILER=smtp`, host, puerto, usuario y contraseña) y `MAIL_FROM_ADDRESS`.

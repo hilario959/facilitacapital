@@ -6,6 +6,7 @@ use App\Models\SiteSetting;
 use App\Support\SiteContent;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -21,6 +22,7 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class EditSite extends Page
 {
@@ -60,13 +62,9 @@ class EditSite extends Page
                         Section::make('Nombre y logo')->columns(2)->schema([
                             TextInput::make('brand.line1')->label('Línea 1')->required()->maxLength(40),
                             TextInput::make('brand.line2')->label('Línea 2')->required()->maxLength(40),
-                            FileUpload::make('brand.logo')
+                            $this->imageUpload('brand.logo')
                                 ->label('Logo (opcional)')
                                 ->helperText('Si subes un logo, reemplaza el isotipo del sitio.')
-                                ->image()
-                                ->disk('public')
-                                ->directory('site')
-                                ->visibility('public')
                                 ->maxSize(2048)
                                 ->columnSpanFull(),
                         ]),
@@ -96,7 +94,7 @@ class EditSite extends Page
                             Textarea::make('hero.lead')->label('Texto')->required()->rows(3)->columnSpanFull(),
                             TextInput::make('hero.primary_cta')->label('Botón principal')->required(),
                             TextInput::make('hero.secondary_cta')->label('Botón secundario')->required(),
-                            FileUpload::make('hero.image')->label('Foto')->image()->disk('public')->directory('site')->visibility('public')->required()->maxSize(5120),
+                            $this->imageUpload('hero.image')->label('Foto')->required()->maxSize(5120),
                             TextInput::make('hero.image_alt')->label('Texto alternativo de la foto')->required(),
                             TextInput::make('hero.float_kicker')->label('Tarjeta: antetítulo')->required(),
                             TextInput::make('hero.float_amount')->label('Tarjeta: monto')->numeric()->prefix('Q')->required(),
@@ -106,7 +104,7 @@ class EditSite extends Page
                             TextInput::make('problem.line_1')->label('Frase destacada')->required(),
                             Textarea::make('problem.line_2')->label('Pregunta')->required()->rows(2),
                             Textarea::make('problem.text')->label('Texto')->required()->rows(3),
-                            FileUpload::make('problem.image')->label('Foto de fondo')->image()->disk('public')->directory('site')->visibility('public')->required()->maxSize(5120),
+                            $this->imageUpload('problem.image')->label('Foto de fondo')->required()->maxSize(5120),
                             TextInput::make('problem.image_alt')->label('Texto alternativo')->required(),
                         ]),
                     ]),
@@ -149,7 +147,7 @@ class EditSite extends Page
                                 TextInput::make('sector')->label('Sector')->required(),
                                 TextInput::make('title')->label('Uso')->required(),
                                 Textarea::make('text')->label('Texto')->required()->rows(2)->columnSpanFull(),
-                                FileUpload::make('image')->label('Foto')->image()->disk('public')->directory('site')->visibility('public')->required()->maxSize(5120)->columnSpanFull(),
+                                $this->imageUpload('image')->label('Foto')->required()->maxSize(5120)->columnSpanFull(),
                             ])
                             ->columns(2)
                             ->minItems(1)
@@ -241,6 +239,36 @@ class EditSite extends Page
             ->title('Cambios guardados')
             ->body('El sitio público ya usa estos textos, colores e imágenes.')
             ->send();
+    }
+
+    private function imageUpload(string $name): FileUpload
+    {
+        $disk = config('filesystems.media_disk', 'public');
+
+        return FileUpload::make($name)
+            ->image()
+            ->disk(is_string($disk) ? $disk : 'public')
+            ->directory('site')
+            ->fetchFileInformation(false)
+            ->getUploadedFileUsing(function (string $file): array {
+                return [
+                    'name' => basename($file),
+                    'size' => 0,
+                    'type' => null,
+                    'url' => SiteContent::url($file),
+                ];
+            })
+            ->saveUploadedFileUsing(function (BaseFileUpload $component, TemporaryUploadedFile $file): ?string {
+                if ($component->getDiskName() === 'public') {
+                    return $component->saveUploadedFile($file);
+                }
+
+                $extension = $file->getClientOriginalExtension();
+                $path = trim($component->getDirectory().'/'.(string) str()->ulid().($extension !== '' ? '.'.$extension : ''), '/');
+                $component->getDisk()->put($path, $file->get());
+
+                return $path;
+            });
     }
 
     /**
